@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysqldb
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=app_user
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=auth_database
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+  app:
+    build: ./
+    restart: on-failure
+    depends_on:
+      - mysqldb
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_USER=app_user
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=auth_database
+      - DATABASE_PORT=3306
+      - DATABASE_HOST=mysqldb
+volumes:
+  db:
