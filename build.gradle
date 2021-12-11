@@ -23,20 +23,27 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
 
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+
+
+
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'mysql:mysql-connector-java'
+
  //   implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'com.auth0:java-jwt:3.8.3'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.auth0:java-jwt:3.8.3'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     compileOnly 'org.projectlombok:lombok'
 
 
-
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
     annotationProcessor 'org.projectlombok:lombok'
+    testRuntimeOnly 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
