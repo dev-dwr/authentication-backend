@@ -1,6 +1,10 @@
 #jdbc:mysql://[mysql-docker-container-name]:[mysql-port]/[db-name]
 #jdbc:mysql://mysqldb:3306/auth_database?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
 #jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
 jwt:
   secret: adads23@3r@#$ADQ1
   expirationTime: 360000
@@ -20,6 +24,22 @@ spring:
       ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  mail:
+    host: localhost
+    port: 1025
+    username: hello
+    password: hello
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
 ---
 

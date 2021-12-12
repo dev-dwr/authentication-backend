@@ -1,11 +1,13 @@
 package com.authentication.authenticationbackend.service;
 
+import com.authentication.authenticationbackend.email.EmailSender;
 import com.authentication.authenticationbackend.exception.CustomException;
 import com.authentication.authenticationbackend.model.AppUserRole;
 import com.authentication.authenticationbackend.model.User;
 import com.authentication.authenticationbackend.payload.RegistrationCredentials;
 import com.authentication.authenticationbackend.repository.UserRepository;
 import com.authentication.authenticationbackend.security.JwtTokenProvider;
+import com.authentication.authenticationbackend.utils.EmailBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,12 +28,25 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
-
+    private static final String REGISTRATION_LINK = "http://localhost:8080/api/auth/confirm?token=";
+    private final EmailSender emailSender;
+    private final EmailBuilder emailBuilder;
 
     public String signin(String email, String password) {
         try {
+            String token = jwtTokenProvider.createToken(email, userRepository.findUserByEmail(email).getAppUserRoles());
+
+            boolean userEnabled = userRepository
+                    .findUserByEmail(email).isEnabled();
+
+            if(!userEnabled){
+                String link = REGISTRATION_LINK + token;
+                emailSender.send(email, emailBuilder.buildEmail(email, link));
+                throw new IllegalStateException("email already taken or you haven't confirm your email");
+            }
+
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-            return jwtTokenProvider.createToken(email, userRepository.findUserByEmail(email).getAppUserRoles());
+            return token;
         } catch (AuthenticationException e) {
             throw new CustomException("Invalid username/password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -45,13 +60,33 @@ public class UserService {
             newUser.setLastname(credentials.getLastname());
             newUser.setPassword(passwordEncoder.encode(credentials.getPassword()));
             newUser.setCreatedAt(Instant.now());
+            newUser.setEnabled(false);
 
             userRepository.save(newUser);
-            return jwtTokenProvider.createToken(credentials.getEmail(), credentials.getAppUserRoles());
+
+            String token = jwtTokenProvider.createToken(credentials.getEmail(), credentials.getAppUserRoles());
+            String link = REGISTRATION_LINK + token;
+            emailSender.send(
+                    credentials.getEmail(),
+                    emailBuilder.buildEmail(credentials.getEmail(), link));
+
+            return token;
 
         } else {
             throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+    }
+
+    public void delete(String email) {
+        userRepository.deleteUserByEmail(email);
+    }
+
+    public User search(String email) {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+        }
+        return user;
     }
 
     public User whoami(HttpServletRequest req) {
@@ -61,5 +96,23 @@ public class UserService {
     public String refreshToken(String email){
         List<AppUserRole> userRoles = userRepository.findUserByEmail(email).getAppUserRoles();
         return jwtTokenProvider.createToken(email,userRoles);
+    }
+    public String confirmToken(String token){
+//        String token = jwtTokenProvider.resolveToken(request);
+        String usersEmail = jwtTokenProvider.getEmail(token);
+
+        User user = userRepository.findUserByEmail(usersEmail);
+
+        if(!user.isEnabled()){
+            enableAppUser(usersEmail);
+        }else{
+            throw new IllegalStateException("Email already confirmed");
+        }
+
+        return "confirmed";
+
+    }
+    private int enableAppUser(String email){
+        return userRepository.enableAppUser(email);
     }
 }
