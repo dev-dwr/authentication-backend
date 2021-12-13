@@ -19,6 +19,7 @@ services:
     restart: on-failure
     depends_on:
       - mysqldb
+      - maildev
     ports:
       - "8080:8080"
     environment:
@@ -27,5 +28,9 @@ services:
       - DATABASE_NAME=auth_database
       - DATABASE_PORT=3306
       - DATABASE_HOST=mysqldb
+  maildev:
+    image: maildev/maildev
+    ports:
+      - "1080:80"
 volumes:
   db:
