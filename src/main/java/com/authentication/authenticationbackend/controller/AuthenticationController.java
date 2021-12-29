@@ -65,7 +65,7 @@ public class AuthenticationController {
         return email;
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/{email}")
     @PreAuthorize("hasRole('ROLE_TEACHER')")
     @ApiOperation(value = "${UserController.search}", response = User.class, authorizations = { @Authorization(value="apiKey") })
     @ApiResponses(value = {
@@ -90,6 +90,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/secured")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
     public String secured() {
         return "secured";
     }

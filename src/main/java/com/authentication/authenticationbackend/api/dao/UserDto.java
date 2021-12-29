@@ -1,6 +1,6 @@
 package com.authentication.authenticationbackend.api.dao;
 
-import com.authentication.authenticationbackend.model.AppUserRole;
+import com.authentication.authenticationbackend.model.AppUserRoles;
 import lombok.Data;
 
 
@@ -13,5 +13,5 @@ public class UserDto {
     private String email;
     private String password;
 
-    List<AppUserRole> appUserRoles;
+    List<AppUserRoles> appUserRoles;
 }

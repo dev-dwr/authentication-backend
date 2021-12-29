@@ -1,14 +1,11 @@
 package com.authentication.authenticationbackend.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.authentication.authenticationbackend.exception.CustomException;
-import com.authentication.authenticationbackend.model.AppUserRole;
+import com.authentication.authenticationbackend.model.AppUserRoles;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,7 +35,7 @@ public class JwtTokenProvider {
         this.userDetailsImpl = userDetailsImpl;
     }
 
-    public String createToken(String email, List<AppUserRole> appUserRoles) {
+    public String createToken(String email, List<AppUserRoles> appUserRoles) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("auth", appUserRoles.stream().map(s -> new SimpleGrantedAuthority(s.getAuthority())).filter(Objects::nonNull).collect(Collectors.toList()));
 

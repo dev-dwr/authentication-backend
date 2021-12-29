@@ -2,7 +2,7 @@ package com.authentication.authenticationbackend.service;
 
 import com.authentication.authenticationbackend.email.EmailSender;
 import com.authentication.authenticationbackend.exception.CustomException;
-import com.authentication.authenticationbackend.model.AppUserRole;
+import com.authentication.authenticationbackend.model.AppUserRoles;
 import com.authentication.authenticationbackend.model.User;
 import com.authentication.authenticationbackend.payload.RegistrationCredentials;
 import com.authentication.authenticationbackend.repository.UserRepository;
@@ -60,6 +60,7 @@ public class UserService {
             newUser.setLastname(credentials.getLastname());
             newUser.setPassword(passwordEncoder.encode(credentials.getPassword()));
             newUser.setCreatedAt(Instant.now());
+            newUser.setAppUserRoles(credentials.getAppUserRoles());
             newUser.setEnabled(false);
 
             userRepository.save(newUser);
@@ -73,7 +74,7 @@ public class UserService {
             return token;
 
         } else {
-            throw new CustomException("Username is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("Email is already in use", HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -94,7 +95,7 @@ public class UserService {
     }
 
     public String refreshToken(String email){
-        List<AppUserRole> userRoles = userRepository.findUserByEmail(email).getAppUserRoles();
+        List<AppUserRoles> userRoles = userRepository.findUserByEmail(email).getAppUserRoles();
         return jwtTokenProvider.createToken(email,userRoles);
     }
     public String confirmToken(String token){

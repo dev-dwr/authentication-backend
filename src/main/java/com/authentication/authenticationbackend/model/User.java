@@ -31,14 +31,14 @@ public class User extends DateAudit {
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<AppUserRole> appUserRoles;
+    private List<AppUserRoles> appUserRoles;
 
     private boolean enabled;
 
     public User() {
     }
 
-    public User(Long id, String firstname, String lastname, String email, String password, List<AppUserRole> appUserRoles, boolean enabled) {
+    public User(Long id, String firstname, String lastname, String email, String password, List<AppUserRoles> appUserRoles, boolean enabled) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
