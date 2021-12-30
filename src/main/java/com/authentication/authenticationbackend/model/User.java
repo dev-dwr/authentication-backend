@@ -10,7 +10,6 @@ import java.util.List;
 @Entity(name = "User")
 @Getter
 @Setter
-@Builder
 @Table(name = "user", uniqueConstraints = {
         @UniqueConstraint(name = "user_email_unique", columnNames = "email")
 })
@@ -27,7 +26,7 @@ public class User extends DateAudit {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -35,16 +34,9 @@ public class User extends DateAudit {
 
     private boolean enabled;
 
-    public User() {
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name="auth_provider")
+    private Provider provider;
 
-    public User(Long id, String firstname, String lastname, String email, String password, List<AppUserRoles> appUserRoles, boolean enabled) {
-        this.id = id;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.email = email;
-        this.password = password;
-        this.enabled = enabled;
-        this.appUserRoles = appUserRoles;
-    }
+    public User(){}
 }

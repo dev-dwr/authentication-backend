@@ -24,6 +24,16 @@ spring:
       ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 616869340736-qvinuf7s6v1iakfp2sv19nol7g516i8l.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
   mail:
     host: localhost
     port: 1025

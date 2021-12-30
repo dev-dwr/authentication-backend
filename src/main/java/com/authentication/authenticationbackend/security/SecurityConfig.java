@@ -1,5 +1,7 @@
 package com.authentication.authenticationbackend.security;
 
+import com.authentication.authenticationbackend.oauth.CustomOAuth2UserService;
+import com.authentication.authenticationbackend.oauth.OAuth2LoginSuccessHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -25,12 +29,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
     private final String secret;
+    private CustomOAuth2UserService oAuth2UserService;
+    private OAuth2LoginSuccessHandler auth2LoginSuccessHandler;
 
 
-    public SecurityConfig(ObjectMapper objectMapper, @Value("${jwt.secret}") String secret, JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfig(ObjectMapper objectMapper, @Value("${jwt.secret}") String secret, JwtTokenProvider jwtTokenProvider,
+                          CustomOAuth2UserService oAuth2UserService, OAuth2LoginSuccessHandler auth2LoginSuccessHandler) {
         this.objectMapper = objectMapper;
         this.secret = secret;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.oAuth2UserService = oAuth2UserService;
+        this.auth2LoginSuccessHandler = auth2LoginSuccessHandler;
     }
 
     @Override
@@ -43,13 +52,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
-                .antMatchers("/api/auth/confirm").permitAll()
                 .antMatchers("/console/**").permitAll()
+
+                .antMatchers("/api/auth/confirm").permitAll()
                 .antMatchers("/api/auth/login").permitAll()
                 .antMatchers("/api/auth/register").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/auth2/**").permitAll()
+                .antMatchers("/").permitAll()
 
-        http.exceptionHandling().accessDeniedPage("/login");
+                .anyRequest().authenticated()
+
+                .and()
+
+                .oauth2Login()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(auth2LoginSuccessHandler)
+
+                .and()
+                .logout(l -> l.logoutRequestMatcher(new AntPathRequestMatcher("/auth2/logout")))
+//                .oauth2ResourceServer()
+//                .jwt()
+        ;
+
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
     }
 
@@ -58,11 +84,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**").allowedMethods("*");
-//    }
 
     @Override
     @Bean

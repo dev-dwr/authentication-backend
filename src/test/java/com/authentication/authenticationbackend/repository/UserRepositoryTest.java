@@ -19,11 +19,11 @@ class UserRepositoryTest {
 
     @BeforeEach
     void initUseCase() {
-        User user1 = User.builder()
-                .firstname("Name")
-                .lastname("lastnem")
-                .password("passw")
-                .email("dada@gmail.com").build();
+        User user1 = new User();
+        user1.setEmail("dada@gmail.com");
+        user1.setFirstname("dada");
+        user1.setLastname("papa");
+        user1.setPassword("lalala");
         userRepository.save(user1);
     }
 

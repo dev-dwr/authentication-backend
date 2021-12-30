@@ -3,6 +3,7 @@ package com.authentication.authenticationbackend.service;
 import com.authentication.authenticationbackend.email.EmailSender;
 import com.authentication.authenticationbackend.exception.CustomException;
 import com.authentication.authenticationbackend.model.AppUserRoles;
+import com.authentication.authenticationbackend.model.Provider;
 import com.authentication.authenticationbackend.model.User;
 import com.authentication.authenticationbackend.payload.RegistrationCredentials;
 import com.authentication.authenticationbackend.repository.UserRepository;
@@ -60,6 +61,7 @@ public class UserService {
             newUser.setLastname(credentials.getLastname());
             newUser.setPassword(passwordEncoder.encode(credentials.getPassword()));
             newUser.setCreatedAt(Instant.now());
+            newUser.setProvider(Provider.LOCAL);
             newUser.setAppUserRoles(credentials.getAppUserRoles());
             newUser.setEnabled(false);
 
