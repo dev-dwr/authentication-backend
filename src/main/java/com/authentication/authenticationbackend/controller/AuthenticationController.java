@@ -66,7 +66,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/{email}")
-    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')  or hasRole('ROLE_USER')")
     @ApiOperation(value = "${UserController.search}", response = User.class, authorizations = { @Authorization(value="apiKey") })
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Something went wrong"),

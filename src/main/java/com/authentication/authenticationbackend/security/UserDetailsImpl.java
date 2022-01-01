@@ -15,7 +15,7 @@ public class UserDetailsImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        com.authentication.authenticationbackend.model.User user = userRepository.findUserByEmail(email);
+        com.authentication.authenticationbackend.model.User user = userRepository.findUserByEmail(email).get();
 
         if (user == null) {
             throw new UsernameNotFoundException("User '" + email + "' not found");

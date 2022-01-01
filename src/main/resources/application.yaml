@@ -29,8 +29,9 @@ spring:
       client:
         registration:
           google:
-            clientId: 616869340736-qvinuf7s6v1iakfp2sv19nol7g516i8l.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: 616869340736-m0mk0l78n18sank5on0drrld7l352rei.apps.googleusercontent.com
+            clientSecret: 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
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - profile
@@ -59,3 +60,9 @@ UserController:
   delete: Deletes specific user by email
   search: Returns specific user by email
   me: Returns current user's data
+---
+
+app:
+  oauth2:
+    authorizedRedirectUris:
+      - "http://localhost:3000/oauth2/redirect"

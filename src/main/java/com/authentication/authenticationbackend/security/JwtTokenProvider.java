@@ -2,6 +2,7 @@ package com.authentication.authenticationbackend.security;
 
 import com.authentication.authenticationbackend.exception.CustomException;
 import com.authentication.authenticationbackend.model.AppUserRoles;
+import com.authentication.authenticationbackend.oauth.UserPrincipal;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -33,6 +34,20 @@ public class JwtTokenProvider {
         this.expirationTime = expirationTime;
         this.secret = secret;
         this.userDetailsImpl = userDetailsImpl;
+    }
+
+    public String createToken(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationTime);
+
+        return Jwts.builder()
+                .setSubject(Long.toString(userPrincipal.getId()))
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
     }
 
     public String createToken(String email, List<AppUserRoles> appUserRoles) {

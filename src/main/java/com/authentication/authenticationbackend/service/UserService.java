@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -35,10 +36,13 @@ public class UserService {
 
     public String signin(String email, String password) {
         try {
-            String token = jwtTokenProvider.createToken(email, userRepository.findUserByEmail(email).getAppUserRoles());
+            String token = jwtTokenProvider.createToken(email, userRepository.findUserByEmail(email).get().getAppUserRoles());
+            Optional<User> userOptional = userRepository.findUserByEmail(email);
 
-            boolean userEnabled = userRepository
-                    .findUserByEmail(email).isEnabled();
+            boolean userEnabled = false;
+            if(userOptional.isPresent()){
+                userEnabled = userOptional.get().isEnabled();
+            }
 
             if(!userEnabled){
                 String link = REGISTRATION_LINK + token;
@@ -62,12 +66,12 @@ public class UserService {
             newUser.setPassword(passwordEncoder.encode(credentials.getPassword()));
             newUser.setCreatedAt(Instant.now());
             newUser.setProvider(Provider.LOCAL);
-            newUser.setAppUserRoles(credentials.getAppUserRoles());
+            newUser.setAppUserRoles(List.of(AppUserRoles.ROLE_TEACHER));
             newUser.setEnabled(false);
 
             userRepository.save(newUser);
 
-            String token = jwtTokenProvider.createToken(credentials.getEmail(), credentials.getAppUserRoles());
+            String token = jwtTokenProvider.createToken(credentials.getEmail(), List.of(AppUserRoles.ROLE_TEACHER));
             String link = REGISTRATION_LINK + token;
             emailSender.send(
                     credentials.getEmail(),
@@ -85,26 +89,22 @@ public class UserService {
     }
 
     public User search(String email) {
-        User user = userRepository.findUserByEmail(email);
-        if (user == null) {
-            throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
-        }
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND));
         return user;
     }
 
     public User whoami(HttpServletRequest req) {
-        return userRepository.findUserByEmail(jwtTokenProvider.getEmail(jwtTokenProvider.resolveToken(req)));
+        return userRepository.findUserByEmail(jwtTokenProvider.getEmail(jwtTokenProvider.resolveToken(req))).get();
     }
 
     public String refreshToken(String email){
-        List<AppUserRoles> userRoles = userRepository.findUserByEmail(email).getAppUserRoles();
+        List<AppUserRoles> userRoles = userRepository.findUserByEmail(email).get().getAppUserRoles();
         return jwtTokenProvider.createToken(email,userRoles);
     }
     public String confirmToken(String token){
-//        String token = jwtTokenProvider.resolveToken(request);
         String usersEmail = jwtTokenProvider.getEmail(token);
 
-        User user = userRepository.findUserByEmail(usersEmail);
+        User user = userRepository.findUserByEmail(usersEmail).get();
 
         if(!user.isEnabled()){
             enableAppUser(usersEmail);

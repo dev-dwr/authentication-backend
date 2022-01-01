@@ -9,9 +9,8 @@ import java.security.Principal;
 public class TestController {
 
     @GetMapping("/")
-    public Principal test(Principal principal){
-        System.out.println("Main" + principal.getName());
-        return principal;
+    public String test(){
+        return "main";
     }
 
 
