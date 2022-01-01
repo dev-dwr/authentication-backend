@@ -1,8 +1,8 @@
 package com.authentication.authenticationbackend.security;
 
+import com.authentication.authenticationbackend.model.User;
 import com.authentication.authenticationbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,7 +15,7 @@ public class UserDetailsImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        com.authentication.authenticationbackend.model.User user = userRepository.findUserByEmail(email).get();
+       User user = userRepository.findUserByEmail(email).get();
 
         if (user == null) {
             throw new UsernameNotFoundException("User '" + email + "' not found");

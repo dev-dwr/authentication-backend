@@ -3,6 +3,7 @@ package com.authentication.authenticationbackend.controller;
 import com.authentication.authenticationbackend.model.User;
 import com.authentication.authenticationbackend.payload.LoginCredentials;
 import com.authentication.authenticationbackend.payload.RegistrationCredentials;
+import com.authentication.authenticationbackend.repository.UserRepository;
 import com.authentication.authenticationbackend.service.UserService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
-
+    private final UserRepository userRepository;
     private final UserService userService;
 
     @ApiOperation(value = "${UserController.signin}")
@@ -42,7 +43,7 @@ public class AuthenticationController {
 
 
     @GetMapping( "/me")
-    @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER')")
+    @PreAuthorize("hasRole('ROLE_STUDENT') or hasRole('ROLE_TEACHER') or hasRole('ROLE_USER')")
     @ApiOperation(value = "${UserController.me}", response = User.class, authorizations = { @Authorization(value="apiKey") })
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Something went wrong"),
@@ -91,7 +92,8 @@ public class AuthenticationController {
 
     @GetMapping("/secured")
     @PreAuthorize("hasRole('ROLE_TEACHER') or hasRole('ROLE_STUDENT')")
-    public String secured() {
+    public String securedFroTesting() {
         return "secured";
     }
+
 }
