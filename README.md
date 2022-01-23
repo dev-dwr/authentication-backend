@@ -1,5 +1,6 @@
 # Authentication Backend
-Sample Authentication Service built with Spring Boot, Security(with JWT), oAuth2(Google SSO) and MYSQL
+Sample Authentication Service built with Spring Boot, Security(with JWT), oAuth2(Google SSO) and MYSQL.
+Link to [Authentication Frontend](https://github.com/dev-dwr/authentication-frontend)
 ## Prerequisites
 1. Java 11
 2. Gradle 7.0
